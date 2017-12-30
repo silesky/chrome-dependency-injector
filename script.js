@@ -1,13 +1,13 @@
 window.imp = null;
 
 (async () => {
-  console.log(`Import activated. Example: imp('jquery') to import jquery.`)
-  var GlobalUtils = (() => {
-    var prevGlobals = Object.keys(window);
+  console.log(`Import activated. Example: imp('ramda') to import R as 'ramda'.`)
+  const GlobalUtils = (() => {
+    const prevGlobals = Object.keys(window);
     return {
       getGlobals: () => {
-        var globals = Object.keys(window);
-        var filtered = globals.filter(eachNewGlobal =>
+        const globals = Object.keys(window);
+        const filtered = globals.filter(eachNewGlobal =>
           prevGlobals.every(prevGlobal => prevGlobal !== eachNewGlobal),
         );
         if (filtered.length) {
@@ -22,15 +22,15 @@ window.imp = null;
   const fetchScriptUri = async moduleName => {
     const endpoint = `https://api.cdnjs.com/libraries?search=${moduleName}`;
     try {
-      var res = await fetch(endpoint);
+      const res = await fetch(endpoint);
       if (!res.ok) {
         throw 'CDN API Error.';
       }
-      var jsonRes = await res.json();
+      const jsonRes = await res.json();
       if (!jsonRes.results.length) {
         throw 'No script found in CDN database.';
       }
-      var { latest: uri, name } = jsonRes.results[0];
+      const { latest: uri, name } = jsonRes.results[0];
       console.log(`Loading ${name}...`);
       return uri;
     } catch (err) {

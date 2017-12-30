@@ -10,13 +10,13 @@
     "https://cdnjs.cloudflare.com/*/*",
     "https://*/*",
     "http://*/*",
-    "tabs"
+    "tabs",
+    "storage"
   ],
   "browser_action": {
     "default_title": "Click to activate"
   },
   "background": {
-
     "scripts": ["background.js", "loadScript.js"],
     "persistent": false
   },

@@ -1,11 +1,30 @@
 // listen for our browerAction to be clicked
-window.extensionIsActivated = false;
+chrome.storage.local.set({ activated: null });
+const getActiveState = callback => {
+  const cb = callback ? callback : res => console.log('Please use a callback.', res);
+  chrome.storage.local.get('activated', cb);
+};
+const toggleActivationState = () => {
+  getActiveState(({ activated }) => {
+    chrome.storage.local.set({ activated: !activated });
+  });
+};
+
 chrome.browserAction.onClicked.addListener(tab => {
-  activateScript(tab);
+  getActiveState(({ activated }) => {
+    chrome.storage.local.set({ activated: !activated });
+    changeBadge(tab, !activated ? 'On' : 'Off');
+    !activated && activateScript(tab);
+  });
 });
 
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-  activateScript(tab);
+  getActiveState(({ activated }) => {
+    if (activated) {
+      activateScript(tab);
+      changeBadge(tab, 'On');
+    }
+  });
 });
 
 const changeBadge = (tab, text) =>
@@ -15,22 +34,13 @@ const changeBadge = (tab, text) =>
   });
 
 const activateScript = tab => {
-
   if (tab.url.includes('chrome://')) {
     console.log(
-      'For security reasons, you cannot use this extension on a chrome:// tab. Please try on a different tab.',
-    );
-    changeBadge(tab, '')
+      'For security reasons, you cannot use this extension on a chrome:// tab. Please try on a different tab.');
+    changeBadge(tab, '');
     return;
   }
-  if (!window.extensionIsActivated) {
-    chrome.tabs.executeScript(tab.Id, { file: 'loadScript.js' });
-    changeBadge(tab, 'On');
-    window.extensionIsActivated = true;
-  } else {
-    changeBadge(tab, '');
-    window.extensionIsActivated = false;
-  }
+  chrome.tabs.executeScript(tab.Id, { file: 'loadScript.js' });
 };
 
 /*
