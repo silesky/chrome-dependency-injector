@@ -1,7 +1,9 @@
 window.imp = null;
 
 (async () => {
-  console.log(`Import activated. Example: imp('ramda') to import R as 'ramda'.`)
+  console.log(
+    `Import activated. Example: imp('ramda') to import R as 'ramda'.`,
+  );
   const GlobalUtils = (() => {
     const prevGlobals = Object.keys(window);
     return {
@@ -47,8 +49,7 @@ window.imp = null;
     script.src = src;
     document.head.appendChild(script);
     setTimeout(GlobalUtils.getGlobals, 500);
-    console.log('Module loaded!');
+    console.log('Module should be loaded.');
   };
-  imp = loadScript;
-  // https://api.cdnjs.com/libraries?search=[query]
+  window.imp = loadScript;
 })();

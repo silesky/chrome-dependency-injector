@@ -1,78 +1,59 @@
 // listen for our browerAction to be clicked
 chrome.storage.local.set({ activated: null });
 const getActiveState = callback => {
-  const cb = callback ? callback : res => console.log('Please use a callback.', res);
+  const cb = callback
+    ? callback
+    : res => console.log('Please use a callback.', res);
   chrome.storage.local.get('activated', cb);
 };
-const toggleActivationState = () => {
+
+const toggleActivationState = val => {
   getActiveState(({ activated }) => {
-    chrome.storage.local.set({ activated: !activated });
+    chrome.storage.local.set({ activated: val || !activated });
   });
 };
 
-chrome.browserAction.onClicked.addListener(tab => {
-  getActiveState(({ activated }) => {
-    chrome.storage.local.set({ activated: !activated });
-    changeBadge(tab, !activated ? 'On' : 'Off');
-    !activated && activateScript(tab);
-  });
-});
-
-chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-  getActiveState(({ activated }) => {
-    if (activated) {
-      activateScript(tab);
-      changeBadge(tab, 'On');
-    }
-  });
-});
-
-const changeBadge = (tab, text) =>
+const changeBadge = (tabId, text) =>
   chrome.browserAction.setBadgeText({
     text: text,
-    tabId: tab.Id,
+    tabId: tabId,
   });
 
 const activateScript = tab => {
   if (tab.url.includes('chrome://')) {
     console.log(
-      'For security reasons, you cannot use this extension on a chrome:// tab. Please try on a different tab.');
-    changeBadge(tab, '');
+      'For security reasons, you cannot use this extension on a chrome:// tab. Please try on a different tab.',
+    );
+    changeBadge(tab.id, '');
+    toggleActivationState(false);
     return;
   }
   chrome.tabs.executeScript(tab.Id, { file: 'loadScript.js' });
 };
 
-/*
-chrome.browserAction.onClicked.addListener(function callback() {
-    chrome.tabs.executeScript(activeTabId, { code: 'loadScript.js' });
-    chrome.tabs.query({active: true, currentWindow: true}, function(arrayOfTabs) {
-
-         // since only one tab should be active and in the current window at once
-         // the return variable should only have one entry
-         var activeTab = arrayOfTabs[0];
-         var activeTabId = arrayOfTabs[0].id; // or do whatever you need
-
-         var code = '';
-
-         if(activeTabs.indexOf(activeTabId) === -1) {
-            // it doesnt already exists on this tab...
-            chrome.browserAction.setBadgeText({
-                text: 'On',
-                tabId: activeTabId
-            });
-            chrome.tabs.executeScript(activeTabId, { code: 'loadScript.js' });
-            activeTabs.push(activeTabId);
-         }
+chrome.browserAction.onClicked.addListener(tab => {
+  getActiveState(({ activated }) => {
+    chrome.storage.local.set({ activated: !activated });
+    changeBadge(tab.id, !activated ? 'On' : '');
+    !activated && activateScript(tab);
   });
-
 });
-*/
 
-// chrome.tabs.onUpdated.addListener(function(tabId) {
+// when I'm on the same page, and I change URLs.
+chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+  getActiveState(({ activated }) => {
+    if (activated) {
+      activateScript(tab);
+      changeBadge(tabId, 'On');
+    } else {
+      changeBadge(tabId, '');
+    }
+  });
+});
 
-//     var index = activeTabs.indexOf(tabId);
-//     if (index > -1) {
-//         activeTabs.splice(index, 1);
-//     }
-// })
+// When I'm switching tabs
+chrome.tabs.onActivated.addListener(({ tabId }) => {
+  getActiveState(({ activated }) => {
+    changeBadge(tabId, activated ? 'On' : '');
+  });
+});
