@@ -1,9 +1,4 @@
-window.imp = null;
-
-(async () => {
-  console.log(
-    `Import activated. Example: imp('ramda') to import R as 'ramda'.`,
-  );
+window.initImportApp = async () => {
   const GlobalUtils = (() => {
     const prevGlobals = Object.keys(window);
     return {
@@ -52,4 +47,9 @@ window.imp = null;
     console.log('Module should be loaded.');
   };
   window.imp = loadScript;
-})();
+};
+
+if (!window.imp) {
+  console.log(`Import activated. Example: imp('ramda') to import R as 'ramda'.`);
+  window.initImportApp();
+}

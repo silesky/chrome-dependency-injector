@@ -13,47 +13,52 @@ const toggleActivationState = val => {
   });
 };
 
-const changeBadge = (tabId, text) =>
+const changeBadge = (tabId, text) => {
   chrome.browserAction.setBadgeText({
-    text: text,
-    tabId: tabId,
+    tabId,
+    text,
   });
-
-const activateScript = tab => {
-  if (tab.url.includes('chrome://')) {
-    console.log(
-      'For security reasons, you cannot use this extension on a chrome:// tab. Please try on a different tab.',
-    );
-    changeBadge(tab.id, '');
-    toggleActivationState(false);
-    return;
-  }
-  chrome.tabs.executeScript(tab.Id, { file: 'loadScript.js' });
+  chrome.browserAction.setBadgeBackgroundColor({
+    tabId,
+    color: text === 'On' ? 'green' : 'red',
+  });
 };
 
+const errMsg =
+  'Cannot inject import on a chrome:// page. Please try a different tab.';
+const urlIsValid = tab => !tab.url.includes('chrome://');
+
+const activateScript = tabId => {
+  chrome.tabs.executeScript(tabId, { file: 'loadScript.js' });
+};
+
+// when I click. - if not previously activated, activate.
 chrome.browserAction.onClicked.addListener(tab => {
   getActiveState(({ activated }) => {
     chrome.storage.local.set({ activated: !activated });
     changeBadge(tab.id, !activated ? 'On' : '');
-    !activated && activateScript(tab);
-  });
-});
-
-// when I'm on the same page, and I change URLs.
-chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-  getActiveState(({ activated }) => {
-    if (activated) {
-      activateScript(tab);
-      changeBadge(tabId, 'On');
+    if (!urlIsValid(tab)) {
+      alert(errMsg);
     } else {
-      changeBadge(tabId, '');
+      !activated && activateScript(tab.id);
     }
   });
 });
 
-// When I'm switching tabs
+// when I'm on the same page, and I change URLs. - if already activated, activate.
+chrome.tabs.onUpdated.addListener((tabId, _, tab) => {
+  getActiveState(({ activated }) => {
+    changeBadge(tabId, activated ? 'On' : '');
+    if (urlIsValid(tab) && activated) {
+      activateScript(tabId);
+    }
+  });
+});
+
+// When I'm switching tabs - if already activated, activate.
 chrome.tabs.onActivated.addListener(({ tabId }) => {
   getActiveState(({ activated }) => {
     changeBadge(tabId, activated ? 'On' : '');
+    activated && activateScript(tabId);
   });
 });
