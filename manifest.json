@@ -1,10 +1,13 @@
 {
-  "name": "Console",
-  "short_name": "Console",
+  "name": "Import",
+  "short_name": "Import",
   "description":
-    "This extension shows how to evaluate script in the content scope",
+    "Import / Inject / require javascript modules in your console.",
   "version": "0.0.1",
   "manifest_version": 2,
+  "icons": {
+    "128": "assets/icons/128.png"
+  },
   "permissions": [
     "https://api.cdnjs.com/libraries/*/*",
     "https://cdnjs.cloudflare.com/*/*",
