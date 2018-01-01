@@ -4,8 +4,10 @@ window.initImportApp = async () => {
     return {
       getGlobals: () => {
         const globals = Object.keys(window);
-        const filtered = globals.filter(eachNewGlobal =>
-          prevGlobals.every(prevGlobal => prevGlobal !== eachNewGlobal),
+        const filtered = globals.filter(
+          eachNewGlobal =>
+            prevGlobals.every(prevGlobal => prevGlobal !== eachNewGlobal) &&
+            eachNewGlobal !== 'imp',
         );
         if (filtered.length) {
           console.log(
@@ -43,13 +45,15 @@ window.initImportApp = async () => {
     script.async = false;
     script.src = src;
     document.head.appendChild(script);
-    setTimeout(GlobalUtils.getGlobals, 500);
+    setTimeout(GlobalUtils.getGlobals, 200);
     console.log('Module should be loaded.');
   };
   window.imp = loadScript;
 };
 
 if (!window.imp) {
-  console.log(`Import activated. Example: imp('ramda') to import R as 'ramda'.`);
+  console.log(
+    `Import activated. Example: imp('ramda') to import R as 'ramda'.`,
+  );
   window.initImportApp();
 }
