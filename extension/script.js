@@ -25,19 +25,21 @@ window.initImportApp = async () => {
       if (!res.ok) {
         throw 'CDN API Error.';
       }
-      const jsonRes = await res.json();
-      if (!jsonRes.results.length) {
+      const { results } = await res.json();
+      if (!results.length) {
         throw 'No script found in CDN database.';
       }
-      const { latest: uri, name } = jsonRes.results[0];
+      const { latest: uri, name } = results[0];
       console.log(`Loading ${name} from ${uri}...`);
       setTimeout(console.log('Module should be loaded.'), 200);
       return uri;
     } catch (err) {
-      if (err.name === 'TypeError') {
-        console.warn('Likely a CSP error. Please try imp() with another URL.');
-      }
-      return err
+      console.warn(
+        err.name === 'TypeError'
+          ? 'Likely a CSP error. Please try imp() with another URL.'
+          : err.message,
+      );
+      return err;
     }
   };
 
