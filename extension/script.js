@@ -30,11 +30,14 @@ window.initImportApp = async () => {
         throw 'No script found in CDN database.';
       }
       const { latest: uri, name } = jsonRes.results[0];
-      console.log(`Loading ${name}...`);
+      console.log(`Loading ${name} from ${uri}...`);
+      setTimeout(console.log('Module should be loaded.'), 200);
       return uri;
     } catch (err) {
-      console.warn('error:', err);
-      return err;
+      if (err.name === 'TypeError') {
+        console.warn('Likely a CSP error. Please try imp() with another URL.');
+      }
+      return err
     }
   };
 
@@ -46,7 +49,6 @@ window.initImportApp = async () => {
     script.src = src;
     document.head.appendChild(script);
     setTimeout(GlobalUtils.getGlobals, 200);
-    console.log('Module should be loaded.');
   };
   window.imp = loadScript;
 };

@@ -1,11 +1,8 @@
 // listen for our browerAction to be clicked
 chrome.storage.local.set({ activated: null });
-const getActiveState = callback => {
-  const cb = callback
-    ? callback
-    : res => console.log('Please use a callback.', res);
-  chrome.storage.local.get('activated', cb);
-};
+
+const getActiveState = callback =>
+  chrome.storage.local.get('activated', callback);
 
 const toggleActivationState = val => {
   getActiveState(({ activated }) => {
@@ -37,10 +34,10 @@ chrome.browserAction.onClicked.addListener(tab => {
   getActiveState(({ activated }) => {
     chrome.storage.local.set({ activated: !activated });
     changeBadge(tab.id, !activated ? 'On' : '');
-    if (!urlIsValid(tab)) {
-      alert(errMsg);
+    if (urlIsValid(tab) && !activated) {
+      activateScript(tab.id);
     } else {
-      !activated && activateScript(tab.id);
+      alert(errMsg);
     }
   });
 });
