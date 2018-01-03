@@ -39,7 +39,6 @@ window.initImportApp = async () => {
           ? 'Likely a CSP error. Please try imp() with another URL.'
           : err.message,
       );
-      return err;
     }
   };
 

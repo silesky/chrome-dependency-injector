@@ -1,8 +1,8 @@
 {
-  "name": "Import",
+  "name": "Import JS",
   "short_name": "Import",
   "description":
-    "Import / Inject / require javascript modules in your console.",
+    "Import javascript dependencies / modules into your console.",
   "version": "0.0.3",
   "manifest_version": 2,
   "icons": {
@@ -20,10 +20,10 @@
     "default_title": "Click to activate"
   },
   "background": {
-    "scripts": ["background.js", "loadScript.js"],
+    "scripts": ["background.js", "loadScript.js", "modifyHeaders.js"],
     "persistent": false
   },
   "web_accessible_resources": ["script.js"],
   "content_security_policy":
-    "script-src 'self' https://cdnjs.cloudflare.com; object-src 'self'"
+    "script-src 'self' https://api.cdnjs.com https://cdnjs.cloudflare.com; object-src 'self'"
 }
