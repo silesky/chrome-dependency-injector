@@ -1,4 +1,6 @@
 window.initImportApp = async () => {
+
+  // locate newly injected globals
   const GlobalUtils = (() => {
     const prevGlobals = Object.keys(window);
     return {
@@ -18,6 +20,7 @@ window.initImportApp = async () => {
       },
     };
   })();
+
   const fetchScriptUri = async moduleName => {
     const endpoint = `https://api.cdnjs.com/libraries?search=${moduleName}`;
     try {
@@ -51,7 +54,9 @@ window.initImportApp = async () => {
     document.head.appendChild(script);
     setTimeout(GlobalUtils.getGlobals, 200);
   };
+
   window.imp = loadScript;
+
 };
 
 if (!window.imp) {
