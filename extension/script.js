@@ -26,11 +26,11 @@ window.initImportApp = async () => {
     try {
       const res = await fetch(endpoint);
       if (!res.ok) {
-        throw 'CDN API Error.';
+        throw Error('CDN API Error.');
       }
       const { results } = await res.json();
       if (!results.length) {
-        throw 'No script found in CDN database.';
+        throw Error('No matching script found in CDN database. Please try again.');
       }
       const { latest: uri, name } = results[0];
       console.log(`Loading ${name} from ${uri}...`);
@@ -40,7 +40,7 @@ window.initImportApp = async () => {
       console.warn(
         err.name === 'TypeError'
           ? 'Likely a CSP error. Please try imp() with another URL.'
-          : err.message,
+          : err.message
       );
     }
   };

@@ -20,7 +20,7 @@
     "default_title": "Click to activate"
   },
   "background": {
-    "scripts": ["background.js", "loadScript.js", "modifyHeaders.js"],
+    "scripts": ["background.js", "loadScript.js"],
     "persistent": false
   },
   "web_accessible_resources": ["script.js"],
